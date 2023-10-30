@@ -1,0 +1,54 @@
+# -*- coding: utf-8 -*-
+"""
+Spyder Editor
+
+This is a temporary script file.
+"""
+
+from audioop import cross
+import numpy as np
+from HullParameterization import Hull_Parameterization as HP
+import csv
+
+def findpoints(Vec): 
+    Hull = HP(Vec)
+
+    Hull.GenGeneralHullform()
+
+    numZ = 20
+    #Cannot start at z = 0 without errors
+    xmidstart = Hull.Lb
+    xmidend = xmidstart + Hull.Lm
+    z = np.linspace(0.001,Hull.Dd, numZ)
+
+    #Plot Cross Section: in the form of [(x,y,z)1 ... (x,y,z)n]
+
+    CS = []
+    Waterlines = []
+    Bow_Prof = []
+    Stern_Prof = []
+
+    for i in range(0,numZ):
+        CS.append((Hull.Lb, Hull.halfBeam_MidBody(z[i]), z[i]))
+        Bow_Prof.append((Hull.bow_profile(z[i]), 0.0, z[i]))
+        Stern_Prof.append((Hull.stern_profile(z[i]), 0.0, z[i]))
+        Waterlines.append([])
+        XY = Hull.gen_waterline_bow(z[i])
+        for j in range(0,100):
+            Waterlines[i].append(XY[j,0])
+            Waterlines[i].append(XY[j,1])
+            Waterlines[i].append(z[i])
+        XY = Hull.gen_waterline_stern(z[i])
+        for j in range(0,100):
+            Waterlines[i].append(XY[j,0])
+            Waterlines[i].append(XY[j,1])
+            Waterlines[i].append(z[i])
+
+
+
+    CrossSec = CS 
+    
+    points = [CS, Waterlines, Bow_Prof, Stern_Prof]
+    return points
+
+
